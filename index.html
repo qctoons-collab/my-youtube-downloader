@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head><meta charset="UTF-8"><title>YouTube ডাউনলোডার</title>
+<style>body{font-family:Arial;text-align:center;padding:20px;}button{padding:10px 20px;margin:10px;}</style></head>
+<body>
+<h1>YouTube ভিডিও ডাউনলোডার</h1>
+<input type="text" id="url" placeholder="YouTube লিঙ্ক পেস্ট করো" style="width:90%;padding:10px;">
+<button onclick="getFormats()">Formats দেখাও</button>
+<div id="result" style="margin-top:20px;"></div>
+
+<script>
+async function getFormats(){
+  let url = document.getElementById('url').value;
+  if(!url){alert("লিঙ্ক দাও!");return;}
+  let formData = new FormData(); formData.append('url',url);
+  try{
+    let res = await fetch('/get-formats',{method:'POST',body:formData});
+    let data = await res.json();
+    let html = `<h3>${data.title||'ভিডিও'}</h3>`;
+    data.formats.forEach(f=>{html+=`<button onclick="downloadVideo('\( {url}',' \){f.format_id}')">${f.resolution} ডাউনলোড</button><br>`;});
+    document.getElementById('result').innerHTML=html;
+  }catch(e){alert("সমস্যা! লিঙ্ক চেক করো");}
+}
+function downloadVideo(u,f){window.location=`/download?url=\( {encodeURIComponent(u)}&format_id= \){f}`;}
+</script>
+</body></html>
